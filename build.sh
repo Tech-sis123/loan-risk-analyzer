@@ -1,4 +1,12 @@
 #!/bin/bash
-python -m pip install --upgrade pip
-python -m pip install wheel setuptools
-python -m pip install -r requirements.txt
+# Exit immediately if a command exits with non-zero status
+set -e
+
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install requirements
+pip install --upgrade pip
+pip install wheel setuptools
+pip install -r requirements.txt
