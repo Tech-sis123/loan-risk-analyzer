@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoRisk | AI-Powered Loan Equity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6e45e2;
+            --secondary: #88d3ce;
+            --accent: #ff7e5f;
+            --dark: #1a1a2e;
+            --light: #f5f5f7;
+            --high-risk: #ff4757;  /* Vibrant red for high risk */
+            --medium-risk: #feca57; /* Yellow for medium risk */
+            --low-risk: #1dd1a1;   /* Green for low risk */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 10%;
+            background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(110,69,226,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .features {
+            padding: 8rem 10%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+        
+        .feature-card p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            display: none;
+            padding: 5rem 10%;
+        }
+        
+        .active-section {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .back-btn {
+            margin-bottom: 2rem;
+            background: none;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(136, 211, 206, 0.1);
+        }
+        
+        /* Analyzer Styles */
+        .analyzer-container {
+            background: rgba(26,26,46,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 800px;
+            margin: 0 auto;
+            scroll-margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255,126,95,0.2);
+        }
+        
+        .result-card {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .risk-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            transition: color 0.3s ease;
+        }
+        
+        .high-risk {
+            color: var(--high-risk);
+            text-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+        }
+        
+        .medium-risk {
+            color: var(--medium-risk);
+        }
+        
+        .low-risk {
+            color: var(--low-risk);
+        }
+        
+        .risk-indicator {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .error-message {
+            color: var(--high-risk);
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing" class="active-section">
+        <section class="hero">
+            <h1>NEO RISK</h1>
+            <p class="tagline">Democratizing access to fair credit through AI-powered risk assessment. Breaking systemic biases in loan approvals.</p>
+            <a href="#" class="btn" id="launch-btn">Launch Risk Analyzer</a>
+        </section>
+        
+        <section class="features">
+            <div class="feature-card">
+                <h3>Financial Inclusion</h3>
+                <p>Our algorithm identifies creditworthy individuals traditional banks overlook, expanding access to capital for underserved communities.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Bias-Free Scoring</h3>
+                <p>Machine learning models evaluate true repayment capacity without demographic prejudices that plague traditional systems.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Transparent AI</h3>
+                <p>Every decision comes with clear explanations - no black boxes. We believe in accountable financial technology.</p>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Analyzer App -->
+    <div id="analyzer" class="app-container">
+        <button class="btn back-btn" id="back-btn">← Back to Overview</button>
+        
+        <div class="analyzer-container" id="analyzerForm">
+            <h2>Loan Risk Analyzer</h2>
+            <form id="riskForm">
+                <div class="form-group">
+                    <label for="income">Annual Income ($)</label>
+                    <input type="number" name="income" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" name="age" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loan_amount">Loan Amount ($)</label>
+                    <input type="number" name="loan_amount" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="credit_score">Credit Score (300-850)</label>
+                    <input type="number" name="credit_score" min="300" max="850" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="credit_utilization">Credit Utilization Ratio (0-1)</label>
+                    <input type="number" name="credit_utilization" step="0.01" min="0" max="1" value="0.5" required>
+                </div>
+                
+                <button type="submit" class="btn">Calculate Risk</button>
+            </form>
+            
+            <div id="resultCard" class="result-card">
+                <h3>Risk Assessment</h3>
+                <div id="riskValue" class="risk-value">0%</div>
+                <p id="riskCategory">No risk data available</p>
+                <p id="riskExplanation"></p>
+            </div>
+            
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+    </div>
+
+    <script>
+        // Section switching with auto-scroll
+        document.getElementById('launch-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('landing').classList.remove('active-section');
+            document.getElementById('analyzer').classList.add('active-section');
+            
+            setTimeout(() => {
+                document.getElementById('analyzerForm').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 100);
+        });
+        
+        // Back button with smooth scroll to top
+        document.getElementById('back-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('analyzer').classList.remove('active-section');
+            document.getElementById('landing').classList.add('active-section');
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Form handling with clear risk thresholds
+        document.getElementById('riskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Hide previous results/errors
+            document.getElementById('resultCard').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Analyzing...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call (replace with actual fetch to your Flask backend)
+            setTimeout(() => {
+                try {
+                    // Mock response - replace with real data from Flask
+                    const mockPrediction = Math.random(); // 0-1
+                    const riskPercent = Math.round(mockPrediction * 100);
+                    
+                    // Determine risk level (51%+ = High Risk)
+                    let riskClass, riskText;
+                    if (riskPercent >= 51) {
+                        riskClass = 'high-risk';
+                        riskText = 'High Risk';
+                    } else if (riskPercent >= 31) {
+                        riskClass = 'medium-risk';
+                        riskText = 'Medium Risk';
+                    } else {
+                        riskClass = 'low-risk';
+                        riskText = 'Low Risk';
+                    }
+                    
+                    // Update UI
+                    const riskValue = document.getElementById('riskValue');
+                    const riskCategory = document.getElementById('riskCategory');
+                    const riskExplanation = document.getElementById('riskExplanation');
+                    
+                    riskValue.textContent = `${riskPercent}%`;
+                    riskCategory.innerHTML = `
+                        <span class="risk-indicator" style="background: var(--${riskClass})"></span>
+                        ${riskText}
+                    `;
+                    riskValue.className = `risk-value ${riskClass}`;
+                    
+                    // Set explanation based on risk level
+                    const explanations = {
+                        'high-risk': 'This application shows significant risk factors (51%+ default probability). Proceed with extreme caution.',
+                        'medium-risk': 'Moderate risk detected (31-50% default probability). Additional review recommended.',
+                        'low-risk': 'Low risk profile detected (0-30% default probability). This appears to be a safe application.'
+                    };
+                    riskExplanation.textContent = explanations[riskClass];
+                    
+                    // Show results
+                    document.getElementById('resultCard').style.display = 'block';
+                    
+                    // Scroll to results
+                    setTimeout(() => {
+                        document.getElementById('resultCard').scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'nearest'
+                        });
+                    }, 300);
+                    
+                } catch (error) {
+                    document.getElementById('errorMessage').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('errorMessage').style.display = 'block';
+                } finally {
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
+                }
+            }, 1500);
+        });
+
+        // Uncomment for actual backend connection
+        /*
+        document.getElementById('riskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Analyzing...';
+            submitBtn.disabled = true;
+            
+            fetch('/', {
+                method: 'POST',
+                body: new FormData(this),
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const riskPercent = Math.round(data.prediction * 100);
+                
+                // Determine risk level (51%+ = High Risk)
+                let riskClass, riskText;
+                if (riskPercent >= 51) {
+                    riskClass = 'high-risk';
+                    riskText = 'High Risk';
+                } else if (riskPercent >= 31) {
+                    riskClass = 'medium-risk';
+                    riskText = 'Medium Risk';
+                } else {
+                    riskClass = 'low-risk';
+                    riskText = 'Low Risk';
+                }
+                
+                // Update UI
+                document.getElementById('riskValue').textContent = `${riskPercent}%`;
+                document.getElementById('riskCategory').innerHTML = `
+                    <span class="risk-indicator" style="background: var(--${riskClass})"></span>
+                    ${riskText}
+                `;
+                document.getElementById('riskValue').className = `risk-value ${riskClass}`;
+                document.getElementById('riskExplanation').textContent = explanations[riskClass];
+                document.getElementById('resultCard').style.display = 'block';
+                
+                setTimeout(() => {
+                    document.getElementById('resultCard').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                }, 300);
+            })
+            .catch(error => {
+                document.getElementById('errorMessage').textContent = 'Server error. Please try again.';
+                document.getElementById('errorMessage').style.display = 'block';
+            })
+            .finally(() => {
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+            });
+        });
+        */
+    </script>
+</body>
+</html>
