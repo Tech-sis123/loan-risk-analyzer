@@ -1,12 +1,12 @@
 #!/bin/bash
-# Exit immediately if a command exits with non-zero status
-set -e
+set -e  # Exit immediately if any command fails
 
-# Create and activate virtual environment
+# Create virtual environment
 python -m venv .venv
 source .venv/bin/activate
 
+# Install build essentials
+pip install --upgrade pip setuptools wheel
+
 # Install requirements
-pip install --upgrade pip
-pip install wheel setuptools
 pip install -r requirements.txt
