@@ -1,4 +1,4 @@
-flask==2.0.3
+
 gunicorn==20.1.0
 scikit-learn==1.0.2
 joblib==1.1.0
@@ -7,3 +7,5 @@ pandas==1.3.5
 matplotlib==3.4.3
 xgboost==1.3.3
 imbalanced-learn==0.8.1
+Werkzeug==2.3.7  # or another compatible version
+Flask==2.3.3     # ensure Flask is also pinned
