@@ -2,20 +2,35 @@ from flask import Flask, request, render_template, jsonify
 import pandas as pd
 import joblib
 from werkzeug.exceptions import BadRequest
+import os
+import sys
 
 app = Flask(__name__)
 
-# Debug: Print available files
-import os
+# Debug: Print environment info
+print("Python version:", sys.version)
 print("Current files:", os.listdir())
 
+# Check package versions
+try:
+    import sklearn
+    import numpy as np
+    print(f"scikit-learn version: {sklearn.__version__}")
+    print(f"numpy version: {np.__version__}")
+except ImportError as e:
+    print(f"Import error: {e}")
+
+# Load model with enhanced error handling
 try:
     model = joblib.load('loan_model.joblib')
     print("✅ Model loaded successfully!")
-    print(f"Model features: {model.feature_names_in_ if hasattr(model, 'feature_names_in_') else 'N/A'}")
+    if hasattr(model, 'feature_names_in_'):
+        print(f"Model features: {model.feature_names_in_}")
+    else:
+        print("Model feature names not available")
 except Exception as e:
     print(f"❌ Model loading failed: {str(e)}")
-    raise
+    raise RuntimeError(f"Failed to load model: {str(e)}") from e
 
 @app.route('/', methods=['GET', 'POST'])
 def predict():
@@ -23,24 +38,34 @@ def predict():
         try:
             print("\n📦 Received form data:", request.form)
             
-            # Validate required fields
-            required = ['income', 'age', 'loan_amount', 'credit_score']
-            if not all(field in request.form for field in required):
-                raise BadRequest("Missing required fields")
-            
-            # Convert inputs with validation
-            input_data = {
-                'income': float(request.form['income']),
-                'age': float(request.form['age']),
-                'loan_amount': float(request.form['loan_amount']),
-                'credit_score': float(request.form['credit_score']),
-                'debt_to_income': float(request.form['loan_amount']) / max(1, float(request.form['income'])),
-                'credit_utilization': float(request.form.get('credit_utilization', 0.5))
+            # Required fields
+            required = {
+                'income': float,
+                'age': float,
+                'loan_amount': float,
+                'credit_score': float
             }
+            
+            # Validate inputs
+            input_data = {}
+            for field, type_cast in required.items():
+                if field not in request.form:
+                    raise BadRequest(f"Missing required field: {field}")
+                try:
+                    input_data[field] = type_cast(request.form[field])
+                except ValueError:
+                    raise BadRequest(f"Invalid value for {field}")
+            
+            # Calculate derived fields
+            input_data['debt_to_income'] = input_data['loan_amount'] / max(1, input_data['income'])
+            input_data['credit_utilization'] = float(request.form.get('credit_utilization', 0.5))
+            
             print("🔢 Processed inputs:", input_data)
             
-            # Create DataFrame matching training format
-            input_df = pd.DataFrame([input_data])
+            # Create DataFrame with expected feature order
+            feature_order = ['income', 'age', 'loan_amount', 'credit_score', 
+                           'debt_to_income', 'credit_utilization']
+            input_df = pd.DataFrame([input_data])[feature_order]
             print("📊 Input DataFrame:", input_df)
             
             # Predict
@@ -49,17 +74,20 @@ def predict():
             
             return jsonify({
                 'prediction': float(probability),
-                'risk': "High Risk" if probability > 0.5 else "Low Risk"
+                'risk': "High Risk" if probability > 0.5 else "Low Risk",
+                'probability': f"{probability*100:.1f}%"
             })
             
-        except Exception as e:
-            print(f"🔥 Error: {str(e)}")
+        except BadRequest as e:
+            print(f"🚨 Validation error: {str(e)}")
             return jsonify({'error': str(e)}), 400
+        except Exception as e:
+            print(f"🔥 Unexpected error: {str(e)}")
+            return jsonify({'error': 'Internal server error'}), 500
     
     return render_template('index.html')
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=False)
 
