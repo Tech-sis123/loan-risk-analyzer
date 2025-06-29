@@ -1,23 +1,19 @@
-# Use official Python 3.10 image
+# Use Python 3.10
 FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy project files
+# Copy everything to container
 COPY . .
 
-# Install system dependencies (if needed)
-RUN apt-get update && apt-get install -y build-essential
-
-# Install pip tools
-RUN pip install --upgrade pip setuptools wheel
-
 # Install dependencies
+RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
-# Expose app port
+# Expose port (adjust to your app's port if needed)
 EXPOSE 8000
 
-# Start your Flask app with Gunicorn
+# Start the app
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+
