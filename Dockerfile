@@ -12,8 +12,8 @@ RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
 # Expose port (adjust to your app's port if needed)
-EXPOSE 8000
+EXPOSE 5000
 
 # Start the app
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
 
