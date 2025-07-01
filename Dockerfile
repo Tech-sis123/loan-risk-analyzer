@@ -1,32 +1,21 @@
-# Use official Python image as base
 FROM python:3.11-slim
 
-# Set environment variables
+# Create a non-root user and switch to it
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app
+WORKDIR /app
+USER appuser
+
+# Rest of your Dockerfile remains the same
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
+ENV PIP_NO_CACHE_DIR=1
 
-# Create and set working directory
-WORKDIR /app
+COPY --chown=appuser:appuser requirements.txt .
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc python3-dev && \
-    rm -rf /var/lib/apt/lists/*
+RUN pip install --user --no-warn-script-location -r requirements.txt
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt .
+COPY --chown=appuser:appuser . .
 
-# Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Copy application files
-COPY . .
-
-# Expose the port Flask runs on
 EXPOSE 5000
-
-# Command to run the application
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
